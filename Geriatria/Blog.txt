@@ -1,0 +1,8 @@
+registro1="La pagina funciona muy bien, he encontrado mucha informacion";
+registro2="Laura Gomez";
+registro3="Que otras enfermedades pueden surgir?";
+registro4="Diana Gonzalez";
+registro5="Que recomiendan los expertos?";
+registro6="Jessica Bueno";
+registro7="Les recomendamos visitar la seccion enfermedades y preguntas frecuentes para resolver sus dudas, o bien visitar la seccion de chat para entrar en contacto con un experto";
+registro8="Doctor Luis Hernandez, geriatra";

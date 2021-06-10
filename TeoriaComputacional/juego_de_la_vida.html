@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>El Juego de la Vida - Teoría Computacional</title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Roboto:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/icofont/icofont.min.css" rel="stylesheet">
+  <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="assets/vendor/owl.carousel/assets/owl.carousel.min.css" rel="stylesheet">
+  <link href="assets/vendor/venobox/venobox.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="assets/css/style.css" rel="stylesheet">
+
+ 
+  <script>
+    var tam=0;
+    var arrayCelulas1;
+    var arrayCelulas2;
+    var generacion=0;
+    function datos_usuario(){
+      errores.innerHTML="";
+      tam=parseInt(document.getElementById("tam").value);
+      var porcentaje=document.getElementById("porcentaje").value;
+      var bandera=false;
+      if(tam<10||tam>20||tam==null){
+        errores.innerHTML="<p style=\"color:red\">Error: Números fuera del intervalo requerido</p>";
+        bandera=true;
+      }
+      if(porcentaje<30||porcentaje>60||porcentaje==null){
+        errores.innerHTML="<p style=\"color:red\">Error: Números fuera del intervalo requerido</p>";
+        bandera=true;
+      }
+      if(!bandera){
+        var listaAleatorias=celulas_vivas_aleatorias(tam, porcentaje);
+        arrayCelulas1=arrayCelulas(tam,listaAleatorias);
+        arrayCelulas2=arrayCelulas(tam,listaAleatorias);
+        for(var i=0;i<arrayCelulas2.length;i++){
+          for(var j=0;j<arrayCelulas2.length;j++)
+          arrayCelulas2[i][j]=arrayCelulas1[i][j];
+        }
+        imprimir_arrayCelulas(tam,arrayCelulas1);
+        generacion=0;
+        div_generacion.innerHTML="<h6>Generacion "+generacion+"</h6>";
+        boton_generacion.innerHTML='<input type="button" class="btn-buy" onclick="sig_generacion()" value="Sig. Generación" style="border: transparent;">';
+        calcular_celulas_vivas();
+      }
+      
+    }
+
+    function sig_generacion(){
+      var cont_vecinas_vivas=0;
+      //arrayCelulas1=arrayCelulas2;
+      for(var i=0;i<arrayCelulas2.length;i++){
+          for(var j=0;j<arrayCelulas2.length;j++)
+          arrayCelulas1[i][j]=arrayCelulas2[i][j];
+      }
+      var cadena='';
+      for (var i=1;i<=tam;i++){
+        for (var j=1;j<=tam;j++){
+          cont_vecinas_vivas=0;
+          if(arrayCelulas1[i-1][j-1]==1){//izq arriba
+            cont_vecinas_vivas++;
+          }
+          if(arrayCelulas1[i-1][j]==1){//arriba
+            cont_vecinas_vivas++;
+          }
+          if(arrayCelulas1[i-1][j+1]==1){//der arriba
+            cont_vecinas_vivas++;
+          }
+          if(arrayCelulas1[i][j-1]==1){//izq
+            cont_vecinas_vivas++;
+          }
+          if(arrayCelulas1[i][j+1]==1){//der
+            cont_vecinas_vivas++;
+          }
+          if(arrayCelulas1[i+1][j-1]==1){//izq abajo
+            cont_vecinas_vivas++;
+          }
+          if(arrayCelulas1[i+1][j]==1){//abajo
+            cont_vecinas_vivas++;
+          }
+          if(arrayCelulas1[i+1][j+1]==1){//der abajo
+            cont_vecinas_vivas++;
+          }
+          //cadena=cadena+arrayCelulas1[i][j]+" ["+i+"]"+"["+j+"]="+cont_vecinas_vivas+"  "+arrayCelulas1[i-1][j-1]+"<br>"; //para ver los cambios
+          if((arrayCelulas1[i][j]==0)&&(cont_vecinas_vivas==3)){//estaba apagada
+            arrayCelulas2[i][j]=1;
+          }
+          if(arrayCelulas1[i][j]==1){//estaba encendida
+            if(cont_vecinas_vivas<2||cont_vecinas_vivas>3){
+              arrayCelulas2[i][j]=0;
+              
+            }
+          }
+        }
+
+      }
+      imprimir_arrayCelulas(tam,arrayCelulas2);
+      generacion++;
+      div_generacion.innerHTML="<h6>Generacion "+generacion+"</h6>";
+      calcular_celulas_vivas();
+      
+    }
+   
+    function celulas_vivas_aleatorias(tam, porcentaje){
+      var total_celulas=tam*tam;
+      var total_vivas=Math.floor(total_celulas*(porcentaje/100));
+      var cadena="";
+      var lista=[Math.floor(Math.random()*(total_celulas-1))+1];  
+      while (lista.length<total_vivas){  
+        var candidato=Math.floor(Math.random()*(total_celulas-1))+1;  
+        var norepe=true;//inicialmente suponemos que no está repetido  
+        while (norepe){  
+          lista.forEach(function(item){  
+            if(candidato==item){  
+              norepe=false; //detectado nº repetido  
+            } 
+          });  
+          if (norepe){  
+            lista.push(candidato); //append al array  
+          }  
+        }  
+      }  
+      lista.forEach(function(item){  
+        cadena=cadena+" "+item;
+      });  
+      //celulas_aleatorias.innerHTML=cadena; esto es para ver los aleatorios que se generaron
+      return lista;
+    }
+    
+    
+
+    function arrayCelulas(tam,listaAleatorias){
+      
+      var arr = new Array(tam+2);
+      
+      for (var i = 0; i < tam+2; i++) {
+        arr[i] = new Array(tam+2);
+      }
+
+      for(var i =0;i<=tam+1;i++){
+        for(var j =0;j<=tam+1;j++){
+          arr[i][j]=0;
+        }
+      }
+      //poner las celulas vivas aleatorias
+      var cont=1;
+      for(var i =1;i<=tam;i++){
+        for(var j =1;j<=tam;j++){
+          arr[i][j]=0;
+          listaAleatorias.forEach(function(item){  //checa si la celula debe estar viva
+            if(item==cont){
+              arr[i][j]=1;
+            }
+          });  
+          cont++;
+        }
+      }
+
+      
+
+      return arr;
+    }
+
+    function imprimir_arrayCelulas(tam,arr) {
+      var cadena="<table>";
+      for(var i=1;i<=tam;i++){//para ver todo: i=0;i<=tam+1;i++
+        cadena=cadena+"<tr>";
+        for(var j=1;j<=tam;j++){
+          if(arr[i][j]==1){
+            cadena=cadena+"<td bgcolor=\"yellow\">"+arr[i][j]+"</td>";
+          }else{
+            cadena=cadena+"<td>"+arr[i][j]+"</td>";
+          }
+          
+        }
+        cadena=cadena+"</tr>";
+      }
+      cadena=cadena+"</table>";
+      resultado.innerHTML=cadena;
+    }
+
+    function calcular_celulas_vivas(){
+      var cont_vivas=0;
+      for(var i =1;i<=tam;i++){
+        for(var j =1;j<=tam;j++){
+          
+          if(arrayCelulas2[i][j]==1){
+            cont_vivas++;
+          }
+        }
+      }
+      var porc_vivas=((cont_vivas*100)/(tam*tam));
+      vivas.innerHTML="<h6>Células vivas: "+cont_vivas+ " Porcentaje: "+porc_vivas+"%</h6>";
+
+    }
+  </script>
+
+  <style>
+    table{
+      width: 400px;
+      height:400px;
+      text-align: center;
+      border: 1px solid black;
+    }
+    td{
+      border: 1px solid black;
+      height: 5%;
+      width:5%;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="fixed-top header-inner-pages">
+    <div class="container-fluid">
+
+      <div class="row justify-content-center">
+        <div class="col-xl-9 d-flex align-items-center">
+          <h1 class="logo mr-auto"><a href="menu_principal.html">Teoría Computacional</a></h1>
+          <!-- Uncomment below if you prefer to use an image logo -->
+          <!-- <a href="index.html" class="logo mr-auto"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
+
+          <nav class="nav-menu d-none d-lg-block">
+            <ul>
+              <li><a href="menu_principal.html">Menú</a></li>
+              <li><a href="operaciones_de_conjuntos.html">Op. Conjuntos</a></li>
+              <li><a href="matriz_adyacencias.html">Grafos</a></li>
+              <li><a href="juego_de_la_vida.html">Juego de la Vida</a></li>
+               <!--<li><a href="#team">Team</a></li>
+              <li class="drop-down"><a href="">Drop Down</a>
+                <ul>
+                  <li><a href="#">Drop Down 1</a></li>
+                  <li class="drop-down"><a href="#">Deep Drop Down</a>
+                    <ul>
+                      <li><a href="#">Deep Drop Down 1</a></li>
+                      <li><a href="#">Deep Drop Down 2</a></li>
+                      <li><a href="#">Deep Drop Down 3</a></li>
+                      <li><a href="#">Deep Drop Down 4</a></li>
+                      <li><a href="#">Deep Drop Down 5</a></li>
+                    </ul>
+                  </li>
+                  <li><a href="#">Drop Down 2</a></li>
+                  <li><a href="#">Drop Down 3</a></li>
+                  <li><a href="#">Drop Down 4</a></li>
+                </ul>
+              </li>
+              <li><a href="#contact">Contact</a></li>-->
+
+            </ul>
+          </nav><!-- .nav-menu -->
+
+          <!--<a href="#about" class="get-started-btn scrollto">Get Started</a>-->
+        </div>
+      </div>
+
+    </div>
+  </header><!-- End Header -->
+
+  <main id="main">
+
+    <!-- ======= Breadcrumbs ======= -->
+    <section class="breadcrumbs">
+      <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center">
+          <h2>El Juego de la Vida</h2>
+          <ol>
+            <li><a href="menu_principal.html">Inicio</a></li>
+            <li>El Juego de la Vida</li>
+          </ol>
+        </div>
+
+      </div>
+    </section><!-- End Breadcrumbs -->
+
+    <section class="inner-page">
+      <div class="container" >
+        <div class="pricing section-bg">
+          <label for="tam"><h5>Tamaño de la matriz (entre 10 y 20):</h5></label>
+          <input type="number" id="tam" name="tam" min="10" max="20">
+          <br>
+          <label for="porcentaje"><h5>Porcentaje de celulas vivas (entre 30% y 60%) :</h5></label>
+          <input type="number" id="porcentaje" name="porcentaje" min="30" max="60">
+          <div id="errores"></div>
+          <br>
+          <input type="button" class="btn-buy" onclick="datos_usuario()" value="Generar Generacion 0" style="border: transparent;">
+          <div id="celulas_aleatorias"></div> 
+          <br>
+          <div id="boton_generacion"></div>
+          <div id="div_generacion"></div>
+          <div id="resultado"></div>
+          <div id="vivas"></div>
+        </div>
+        
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer">
+
+    <div class="footer-top">
+      <div class="container">
+        <div class="row">
+
+          <div class="col-lg-3 col-md-6 footer-contact">
+            <h3>Teoría Computacional</h3>
+            <p>
+              
+            </p>
+          </div>
+
+          <div class="col-lg-6 col-md-6 footer-links">
+            <h4>Hecho por:</h4>
+            <h5>Diana Patricia González Flores</h5>
+            <h5>170812</h5>
+          </div>
+
+          
+
+        </div>
+      </div>
+    </div>
+
+    
+
+    </div>
+  </footer><!-- End Footer -->
+
+  <a href="#" class="back-to-top"><i class="icofont-simple-up"></i></a>
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/jquery/jquery.min.js"></script>
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/jquery.easing/jquery.easing.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+  <script src="assets/vendor/waypoints/jquery.waypoints.min.js"></script>
+  <script src="assets/vendor/counterup/counterup.min.js"></script>
+  <script src="assets/vendor/owl.carousel/owl.carousel.min.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="assets/vendor/venobox/venobox.min.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="assets/js/main.js"></script>
+
+</body>
+
+</html>
